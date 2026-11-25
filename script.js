@@ -343,12 +343,14 @@
   });
 
   /* ------------------------------------------------------------------------
-     Formulario de Contacto (Validación y Estado de Envío)
+     Formulario de Contacto (Validación y Reenvío a WhatsApp +595 983 538179)
      ------------------------------------------------------------------------ */
+  const WHATSAPP_NUMBER = '595983538179';
   const contactForm = document.getElementById('contact-form');
   const formError = document.getElementById('form-error');
   const formSuccess = document.getElementById('form-success');
   const successMessage = document.getElementById('success-message');
+  const whatsappDirectLink = document.getElementById('whatsapp-direct-link');
   const resetFormBtn = document.getElementById('reset-form-btn');
 
   if (contactForm) {
@@ -358,6 +360,7 @@
       const telefono = contactForm.telefono.value.trim();
       const email = contactForm.email.value.trim();
       const tipo = contactForm['tipo-proyecto'].value;
+      const mensaje = contactForm.mensaje.value.trim();
 
       if (!nombre || !telefono || !email) {
         formError.textContent = 'Por favor completá tu nombre, teléfono y correo electrónico.';
@@ -371,11 +374,31 @@
 
       formError.textContent = '';
 
-      // Ocultar campos y mostrar confirmación limpia
+      const lines = [
+        'Hola *White Arquitectura · Ingeniería*, envío una consulta desde la web:',
+        '',
+        `*Nombre:* ${nombre}`,
+        `*Teléfono:* ${telefono}`,
+        `*Correo:* ${email}`,
+        `*Tipo de proyecto:* ${tipo}`
+      ];
+      if (mensaje) {
+        lines.push(`*Detalles:* ${mensaje}`);
+      }
+
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
+
+      // Actualizar enlace de respaldo y abrir WhatsApp en nueva pestaña
+      if (whatsappDirectLink) {
+        whatsappDirectLink.href = waUrl;
+      }
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+      // Ocultar campos y mostrar confirmación limpia con acceso directo a WhatsApp
       contactForm.querySelectorAll('.form-row, .field, .form-footer').forEach((el) => {
         el.hidden = true;
       });
-      successMessage.textContent = `Gracias, ${nombre}. Recibimos tu consulta sobre "${tipo}". Un profesional de White Arquitectura · Ingeniería te contactará a la brevedad.`;
+      successMessage.textContent = `Gracias, ${nombre}. Tu consulta sobre "${tipo}" fue preparada para WhatsApp (+595 983 538179). Si no se abrió automáticamente, presioná el botón de abajo.`;
       formSuccess.hidden = false;
     });
 
